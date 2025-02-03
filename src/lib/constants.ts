@@ -1,0 +1,17 @@
+export const CATEGORIES = [
+  "Tech Talk",
+  "Life Hacks",
+  "Creative Corner",
+  "Foodie Adventures",
+  "Pop Culture",
+  "Music Vibes",
+  "Travel Diaries",
+  "Gaming World",
+  "Inspiration",
+  "Memes & Fun",
+  "Health & Wellness",
+  "DIY Projects",
+  "Books & Reviews",
+  "Art & Design",
+  "Tech Tutorials",
+]
