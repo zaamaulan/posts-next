@@ -9,17 +9,18 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model Post {
-  id        Int      @id @default(autoincrement())
-  title     String
-  content   String
-  slug      String   @unique
-  views     Int      @default(0)
-  category  String
+  id       Int    @id @default(autoincrement())
+  title    String
+  content  String
+  slug     String @unique
+  views    Int    @default(0)
+  category String
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
