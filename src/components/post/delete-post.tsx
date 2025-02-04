@@ -10,23 +10,24 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
+import { Button } from "@/components/ui/button"
 import { useToast } from "@/hooks/use-toast"
 import { axiosInstance } from "@/services/api"
 import { Trash } from "lucide-react"
-import { usePathname, useRouter } from "next/navigation"
+import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { mutate } from "swr"
-import { Button } from "@/components/ui/button"
 
-export const DeletePost = () => {
+interface DeletePostProps {
+  id: string
+}
+
+export const DeletePost = ({ id }: DeletePostProps) => {
   const { toast } = useToast()
 
   const [open, setOpen] = useState(false)
 
   const router = useRouter()
-  const pathname = usePathname()
-
-  const id = pathname.split("/")[1]
 
   if (!id) return null
 

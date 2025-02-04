@@ -12,15 +12,27 @@ export const GET = async (request: Request) => {
     const category = searchParams.get("category") ?? ""
 
     const where: Prisma.PostWhereInput = {
-      AND: [{ title: { contains: search } }, { category: { contains: category } }],
+      AND: [
+        {
+          title: {
+            contains: search,
+          },
+        },
+        {
+          category: {
+            name: {
+              contains: category,
+            },
+          },
+        },
+      ],
     }
 
-    const res = await prisma.post.findMany({ where, orderBy: { createdAt: "desc" } })
-
+    const res = await prisma.post.findMany({ where, include: { category: true }, orderBy: { createdAt: "desc" } })
     return NextResponse.json({ message: "Posts fetched successfully", data: res })
   } catch (error) {
     console.log(error)
-    return NextResponse.json({ message: "Failed to fetch posts", status: 500 })
+    return NextResponse.json({ message: "Failed to fetch posts" }, { status: 500 })
   }
 }
 
@@ -30,20 +42,22 @@ export const POST = async (request: Request) => {
     const parsed = postSchema.safeParse(body)
 
     if (!parsed.success) {
-      return NextResponse.json({ message: parsed.error.flatten(), status: 400 })
+      return NextResponse.json({ message: parsed.error.flatten() }, { status: 400 })
     }
 
     const slug = generateSlug(parsed.data.title)
 
-    const res = await prisma.post.create({ data: { ...body, slug } })
+    const res = await prisma.post.create({
+      data: { ...body, slug, categoryId: +parsed.data.categoryId },
+    })
     return NextResponse.json({ message: "Post created successfully", data: res })
   } catch (error) {
     if (error instanceof PrismaClientKnownRequestError) {
       if (error.code === "P2002") {
-        return NextResponse.json({ message: "Post already exists", status: 400 })
+        return NextResponse.json({ message: "Post already exists" }, { status: 400 })
       }
     }
     console.log("Error creating post:", error)
-    return NextResponse.json({ message: "Failed to create post", status: 500 })
+    return NextResponse.json({ message: "Failed to create post" }, { status: 500 })
   }
 }

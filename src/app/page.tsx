@@ -1,6 +1,6 @@
-import FilterCategory from "@/components/post/filter-category/filter-category"
-import { PostList } from "@/components/post/post-list/post-list"
-import { SearchPost } from "@/components/post/search-post/search-post"
+import FilterCategory from "@/components/post/filter-category"
+import { PostList } from "@/components/post/post-list"
+import { SearchPost } from "@/components/post/search-post"
 import { Suspense } from "react"
 
 const HomePage = () => {

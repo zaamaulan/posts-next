@@ -1,57 +1,62 @@
 "use client"
 
+import { RoundSpinner } from "@/components/icons/round-spinner"
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import TiptapEditor from "@/components/ui/tiptap-editor"
 import { useToast } from "@/hooks/use-toast"
 import { postSchema } from "@/lib/schema"
 import { axiosInstance } from "@/services/api"
+import { Category, Post } from "@/types"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
+import { useEffect } from "react"
 import { useForm } from "react-hook-form"
-import useSWR, { mutate } from "swr"
+import useSWR from "swr"
 import { z } from "zod"
-import TiptapEditor from "@/components/ui/tiptap-editor"
-import { Post } from "@/types"
 
-export const PostForm = ({ onClose, id }: { onClose: () => void; id?: string }) => {
+interface PostFormProps {
+  id?: string
+  post?: Post
+}
+
+export const PostForm = ({ id, post }: PostFormProps) => {
   const { toast } = useToast()
+  const router = useRouter()
 
-  const [isLoading, setIsLoading] = useState(false)
-
-  const { data } = useSWR<Post>(id ? `/posts/${id}` : null)
+  const { data: categories, isLoading: isCategoriesLoading } = useSWR<Category[]>("/categories")
 
   const form = useForm<z.infer<typeof postSchema>>({
     resolver: zodResolver(postSchema),
     defaultValues: {
       title: "",
       content: "",
-      category: "",
     },
   })
 
+  console.log(post)
+
   useEffect(() => {
-    if (data) {
-      form.reset(data)
+    if (post && !isCategoriesLoading) {
+      form.reset({ ...post, categoryId: post.categoryId.toString() || "" })
     }
-  }, [data, form])
+  }, [post, form, isCategoriesLoading])
 
   const onSubmit = async (values: z.infer<typeof postSchema>) => {
-    setIsLoading(true)
+    console.log(values)
 
     try {
-      if (id) {
-        await axiosInstance.patch(`/posts/${id}`, values)
-        mutate(`/posts/${id}`)
-      } else {
-        await axiosInstance.post("/posts", values)
+      const res = id ? await axiosInstance.patch(`/posts/${id}`, values) : await axiosInstance.post("/posts", values)
+
+      if (res.status === 200) {
+        router.push(id ? `/${id}` : "/")
+        toast({
+          title: "Success",
+          description: `Post ${id ? "updated" : "created"} successfully`,
+        })
       }
-      mutate("/posts")
-      toast({
-        title: "Success",
-        description: `Post ${id ? "updated" : "created"} successfully`,
-      })
-      onClose()
     } catch (error) {
       console.log(error)
       toast({
@@ -59,8 +64,6 @@ export const PostForm = ({ onClose, id }: { onClose: () => void; id?: string }) 
         description: `Failed to ${id ? "update" : "create"} post`,
         variant: "destructive",
       })
-    } finally {
-      setIsLoading(false)
     }
   }
 
@@ -82,12 +85,23 @@ export const PostForm = ({ onClose, id }: { onClose: () => void; id?: string }) 
         />
         <FormField
           control={form.control}
-          name="category"
+          name="categoryId"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Category</FormLabel>
               <FormControl>
-                <Input placeholder="Labore est" {...field} />
+                <Select defaultValue={post?.categoryId.toString()} onValueChange={field.onChange}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories?.map((category) => (
+                      <SelectItem key={category.id} value={category.id.toString()}>
+                        {category.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -110,10 +124,14 @@ export const PostForm = ({ onClose, id }: { onClose: () => void; id?: string }) 
             </FormItem>
           )}
         />
-
-        <Button type="submit" disabled={isLoading}>
-          {isLoading ? "Submitting..." : id ? "Update Post" : "Create Post"}
-        </Button>
+        <div className="inline-grid grid-cols-2 gap-2">
+          <Button type="button" variant="secondary" onClick={() => router.back()}>
+            Cancel
+          </Button>
+          <Button type="submit" disabled={form.formState.isSubmitting}>
+            {form.formState.isSubmitting && <RoundSpinner color="white" />} {id ? "Update Post" : "Create Post"}
+          </Button>
+        </div>
       </form>
     </Form>
   )

@@ -20,9 +20,6 @@ export const PATCH = async (request: Request, { params }: { params: Promise<{ id
       if (error.code === "P2025") {
         return NextResponse.json({ message: "Post not found", status: 404 })
       }
-      if (error.code === "P2002") {
-        return NextResponse.json({ message: "Post already exists", status: 400 })
-      }
     }
     console.log("Error updating post:", error)
     return NextResponse.json({ message: "Failed to update post views", status: 500 })

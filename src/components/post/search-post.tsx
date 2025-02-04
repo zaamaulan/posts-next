@@ -11,7 +11,7 @@ export const SearchPost = () => {
 
   const handleSearch = useDebouncedCallback((e: ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value)
-  }, 500)
+  }, 750)
 
   return (
     <div>

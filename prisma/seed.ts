@@ -4,8 +4,9 @@ import { fakerID_ID as faker } from "@faker-js/faker"
 
 const main = async () => {
   await prisma.post.deleteMany()
+  await prisma.category.deleteMany()
 
-  Array.from({ length: 20 }).forEach(async () => {
+  Array.from({ length: CATEGORIES.length }).map(async (_, i) => {
     const paragraph = faker.lorem.paragraphs(7)
     const content = paragraph
       .split("\n")
@@ -16,15 +17,27 @@ const main = async () => {
     const slug = title.replace(/ /g, "-").toLowerCase() + `-${date.getTime()}`
 
     await prisma.post.create({
+      include: {
+        category: true,
+      },
       data: {
         title: title,
         slug: slug,
         content: content,
-        category: faker.helpers.arrayElement(CATEGORIES),
         views: faker.number.int({ min: 1, max: 100 }),
+        category: {
+          create: {
+            name: CATEGORIES[i],
+          }
+        }
       },
     })
   })
+  // await prisma.category.createMany({
+  //   data: {
+  //     name: 'Tech',
+  //   },
+  // })
 }
 
 main()

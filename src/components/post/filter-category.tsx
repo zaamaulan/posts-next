@@ -18,7 +18,7 @@ const FilterCategory = () => {
   }
 
   return (
-    <Select value={category} onValueChange={handleFilter}>
+    <Select defaultValue={category === "" ? "all" : category} onValueChange={handleFilter}>
       <SelectTrigger className="w-[180px]">
         <SelectValue placeholder="Filter" />
       </SelectTrigger>

@@ -1,12 +1,14 @@
 "use client"
 
 import { Badge } from "@/components/ui/badge"
+import { buttonVariants } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
+import { cn } from "@/lib/utils"
 import { Post } from "@/types"
+import { Pencil } from "lucide-react"
 import Link from "next/link"
 import { useQueryState } from "nuqs"
 import useSWR from "swr"
-import { CreatePost } from "../create-post/create-post"
 
 export const PostList = () => {
   const [search] = useQueryState("search", { defaultValue: "" })
@@ -17,7 +19,7 @@ export const PostList = () => {
     if (search) params.append("search", search)
     if (category) params.append("category", category)
 
-    return params.toString() ? `/posts${params.toString()}` : "/posts"
+    return `/posts?${params.toString()}`
   })
 
   if (isLoading)
@@ -39,13 +41,15 @@ export const PostList = () => {
       </div>
     )
 
+  if (!data?.length) return <div className="text-muted-foreground">No posts found</div>
+
   return (
     <>
       <div className="flex flex-col gap-8">
         {data?.map((item) => (
           <Link key={item.id} href={`/${item.id}`}>
-            <div className="!space-y-1.5 p-4 hover:bg-accent rounded-lg transition-colors ease-in-out">
-              <Badge className="rounded-">{item.category}</Badge>
+            <div className="!space-y-1.5">
+              <Badge className="rounded-">{item.category.name}</Badge>
               <h3 className="capitalize line-clamp-2 text-xl font-medium">{item.title}</h3>
               <div
                 className="line-clamp-2 text-muted-foreground"
@@ -55,7 +59,11 @@ export const PostList = () => {
           </Link>
         ))}
       </div>
-      {!search && !category && <CreatePost />}
+
+      <Link href="/new" className={cn("fixed bottom-4 right-4", buttonVariants())}>
+        <Pencil />
+        <span>Create Post</span>
+      </Link>
     </>
   )
 }
