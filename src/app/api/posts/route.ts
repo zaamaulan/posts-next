@@ -15,13 +15,13 @@ export const GET = async (request: Request) => {
       AND: [
         {
           title: {
-            contains: search,
+            contains: search.toLowerCase(),
           },
         },
         {
           category: {
             name: {
-              contains: category,
+              contains: category.toLowerCase(),
             },
           },
         },

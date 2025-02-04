@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import TiptapEditor from "@/components/ui/tiptap-editor"
 import { useToast } from "@/hooks/use-toast"
 import { postSchema } from "@/lib/schema"
+import { capitalize } from "@/lib/utils"
 import { axiosInstance } from "@/services/api"
 import { Category, Post } from "@/types"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -36,8 +37,6 @@ export const PostForm = ({ id, post }: PostFormProps) => {
     },
   })
 
-  console.log(post)
-
   useEffect(() => {
     if (post && !isCategoriesLoading) {
       form.reset({ ...post, categoryId: post.categoryId.toString() || "" })
@@ -45,8 +44,6 @@ export const PostForm = ({ id, post }: PostFormProps) => {
   }, [post, form, isCategoriesLoading])
 
   const onSubmit = async (values: z.infer<typeof postSchema>) => {
-    console.log(values)
-
     try {
       const res = id ? await axiosInstance.patch(`/posts/${id}`, values) : await axiosInstance.post("/posts", values)
 
@@ -97,7 +94,7 @@ export const PostForm = ({ id, post }: PostFormProps) => {
                   <SelectContent>
                     {categories?.map((category) => (
                       <SelectItem key={category.id} value={category.id.toString()}>
-                        {category.name}
+                        {capitalize(category.name)}
                       </SelectItem>
                     ))}
                   </SelectContent>

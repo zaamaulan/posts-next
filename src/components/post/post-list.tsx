@@ -3,7 +3,7 @@
 import { Badge } from "@/components/ui/badge"
 import { buttonVariants } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
-import { cn } from "@/lib/utils"
+import { capitalize, cn } from "@/lib/utils"
 import { Post } from "@/types"
 import { Pencil } from "lucide-react"
 import Link from "next/link"
@@ -49,7 +49,7 @@ export const PostList = () => {
         {data?.map((item) => (
           <Link key={item.id} href={`/${item.id}`}>
             <div className="!space-y-1.5">
-              <Badge className="rounded-">{item.category.name}</Badge>
+              <Badge>{capitalize(item.category.name)}</Badge>
               <h3 className="capitalize line-clamp-2 text-xl font-medium">{item.title}</h3>
               <div
                 className="line-clamp-2 text-muted-foreground"

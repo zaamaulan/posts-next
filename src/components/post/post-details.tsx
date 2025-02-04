@@ -4,7 +4,7 @@ import { CalendarIcon, ViewIcon } from "@/components/icons/icons"
 import { Badge } from "@/components/ui/badge"
 import { buttonVariants } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
-import { cn } from "@/lib/utils"
+import { capitalize, cn } from "@/lib/utils"
 import { axiosInstance } from "@/services/api"
 import { Post } from "@/types"
 import { Pencil } from "lucide-react"
@@ -51,11 +51,21 @@ export const PostDetails = ({ id }: { id: string }) => {
     )
   }
 
+  if (!data)
+    return (
+      <div className="flex flex-col w-full space-y-1.5">
+        <h1 className="font-semibold text-2xl">No post found</h1>
+        <Link href="/" className={cn('w-fit',buttonVariants({ variant: "secondary" }))}>
+          Back to Post List
+        </Link>
+      </div>
+    )
+
   return (
     <>
       <div className="space-y-10">
         <div className="space-y-2">
-          <Badge>{data?.category.name}</Badge>
+          <Badge>{capitalize(data?.category.name)}</Badge>
           <h2 className="capitalize text-3xl font-semibold">{data?.title}</h2>
           <div className="inline-flex gap-4 items-center">
             <div className="text-muted-foreground text-sm inline-flex gap-2 items-center ">

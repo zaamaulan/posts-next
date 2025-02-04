@@ -2,6 +2,7 @@
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { CATEGORIES } from "@/lib/constants"
+import { capitalize } from "@/lib/utils"
 import { Post } from "@/types"
 import { useQueryState } from "nuqs"
 import useSWR from "swr"
@@ -13,12 +14,16 @@ const FilterCategory = () => {
 
   if (!data?.length) return null
 
+  const isAll = (category: string) => {
+    return category === "all"
+  }
+
   const handleFilter = (category: string) => {
-    setCategory(category === "all" ? "" : category)
+    setCategory(isAll(category) ? "" : category)
   }
 
   return (
-    <Select defaultValue={category === "" ? "all" : category} onValueChange={handleFilter}>
+    <Select defaultValue={!isAll(category) ? "" : category} onValueChange={handleFilter}>
       <SelectTrigger className="w-[180px]">
         <SelectValue placeholder="Filter" />
       </SelectTrigger>
@@ -26,7 +31,7 @@ const FilterCategory = () => {
         <SelectItem value={"all"}>All</SelectItem>
         {CATEGORIES.map((category, index) => (
           <SelectItem key={index} value={category.toLowerCase()}>
-            {category}
+            {capitalize(category)}
           </SelectItem>
         ))}
       </SelectContent>

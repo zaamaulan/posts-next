@@ -27,9 +27,9 @@ const main = async () => {
         views: faker.number.int({ min: 1, max: 100 }),
         category: {
           create: {
-            name: CATEGORIES[i],
-          }
-        }
+            name: CATEGORIES[i].toLowerCase(),
+          },
+        },
       },
     })
   })
